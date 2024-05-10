@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#BSUB -n 8  # minmal numbers of processors required for a parallel job
+#BSUB -R rusage[mem=4000] # ask for memory 5G
+#BSUB -W 4:00 #limit the job to be finished in 12 hours
+#BSUB -J "star[1]%33"
+#BSUB -q  short   # which queue we want to run in
+#BSUB -o logs/out.%J.%I.txt # log
+#BSUB -e logs/err.%J.%I.txt # error
+#BSUB -R "span[hosts=1]" # All hosts on the same chassis"
+##BSUB -w "done(156910)"
+
+i=$(($LSB_JOBINDEX - 1))
+outdir=./docs
+wget -P $outdir  https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz 
+wget -P $outdir  https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+wget -P $outdir  https://ftp.ensembl.org/pub/release-111/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+
+cat $outdir/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz $outdir/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz > \
+$outdir/Homo_sapiens.GRCh38.cdna.ncrna.fa.gz
+
+species=human
+genome_fasta=${outdir}/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+txtome_fasta=${outdir}/Homo_sapiens.GRCh38.cdna.ncrna.fa.gz
+
+out=docs/${species}
+mkdir -p $out
+
+grep '^>' $genome_fasta | cut -d " " -f 1 | perl -p -e 's{^>}{}g' > $out/decoys.txt
+
+cat  <(zcat $txtome_fasta | perl -p -e 's{[._].+$}{} if /^>/')  $genome_fasta | gzip > $out/gentrome.fa.gz
+
+salmon index -t $out/gentrome.fa.gz \
+             -d $out/decoys.txt\
+             -p 8 \
+             -i $out/${species}_salmon_index

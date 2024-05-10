@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#BSUB -n 4  # minmal numbers of processors required for a parallel job
+#BSUB -R rusage[mem=2000] # ask for memory 5G
+#BSUB -W 24:00 #limit the job to be finished in 12 hours
+#BSUB -J "fastQC[1-14]%3"
+#BSUB -q long   # which queue we want to run in
+#BSUB -o logs/out.%J.%I.txt # log
+#BSUB -e logs/err.%J.%I.txt # error
+#BSUB -R "span[hosts=1]" # All hosts on the same chassis"
+##BSUB -w "done(112815[7]) && done(112815[6])"
+
+i=$(($LSB_JOBINDEX- 1))
+mkdir -p logs
+
+srr=(`cat docs/RNAseq.GEO.ACC.txt`)
+
+out=data
+
+mkdir -p $out 
+
+module load  sratoolkit/3.0.0
+set -euo pipefail
+
+fasterq-dump --outdir  ${out}  --threads 4  --split-files  ${srr[$i]}
+gzip  ${out}/${srr[$i]}*.fastq  
+
+

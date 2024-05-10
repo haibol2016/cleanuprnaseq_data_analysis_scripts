@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#BSUB -n 8  # minmal numbers of processors required for a parallel job
+#BSUB -R rusage[mem=16000] # ask for memory 5G
+#BSUB -W 8:00 #limit the job to be finished in 12 hours
+#BSUB -J "star_index[1]"
+#BSUB -q long   # which queue we want to run in
+#BSUB -o logs/out.%J.%I.txt # log
+#BSUB -e logs/err.%J.%I.txt # error
+#BSUB -R "span[hosts=1]" # All hosts on the same chassis"
+##BSUB -w "done(5423513)"
+
+i=$(($LSB_JOBINDEX- 1))
+mkdir -p logs
+
+module load star/2.7.10a
+set -euo pipefail 
+
+genome_assembly=GRCh38
+
+fasta=docs/Homo_sapiens.GRCh38.dna.primary_assembly.fa 
+gtf=docs/Homo_sapiens.GRCh38.110.gtf 
+overhang=(150)
+
+out=docs/${genome_assembly}_overhang${overhang[$i]}
+mkdir -p $out
+
+STAR --runMode genomeGenerate \
+        --runThreadN 8  --genomeDir $out   \
+        --limitGenomeGenerateRAM 128000000000  \
+	--genomeChrBinNbits 15 \
+        --genomeFastaFiles $fasta \
+	--sjdbGTFfile ${gtf}  \
+        --outFileNamePrefix ${overhang[$i]} 
