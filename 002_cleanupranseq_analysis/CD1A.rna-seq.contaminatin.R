@@ -6,21 +6,21 @@ devtools::load_all(pkg)
 setwd(r"(C:\Users\liuh\OneDrive - University Of Massachusetts Medical School\Desktop\DNA conatmination\data\Michelle.RNA-seq\03082024)")
 
 ## making a EnsDb using the GTF v110 for GRCh38
-ensdb_sqlite <- make_ensdb(gtf = "docs/Homo_sapiens.GRCh38.110.gtf",
-                       outfile = "docs/GRCh38.V110.ensdb.sqlite",
+ensdb_sqlite <- make_ensdb(gtf = "Homo_sapiens.GRCh38.110.gtf",
+                       outfile = "GRCh38.V110.ensdb.sqlite",
                        organism_latin_name = "Homo_sapiens",
                        genome_version = "GRCh38",
                        Ensembl_release_version = 110)
 #
 # ## generate SAF for genomic features:
-saf_list <- get_feature_saf(ensdb_sqlite = "docs/GRCh38.V110.ensdb.sqlite",
+saf_list <- get_feature_saf(ensdb_sqlite = "GRCh38.V110.ensdb.sqlite",
       bamfile = "results/003.samtools.sort.out/K084CD7PCD1P_S17_L001.srt.bam",
                             mitochondrial_genome = c("MT", "chrM"),
                             chloroplast_genome = c("chrPltd", "Pltd"))
 
 ## Summarize read counts
 counts_summary <- summarize_reads(
-                            metadata = "docs/Michelle.CD1A.RNAseq.txt",  
+                            metadata = "Michelle.CD1A.RNAseq.txt",  
                             isPairedEnd = TRUE,
                             strandSpecific = 0,
                             saf_list = saf_list,
@@ -28,6 +28,7 @@ counts_summary <- summarize_reads(
                             threads = 8)
 salmon <- salmon_res(metadata = metadata,
                      ensdb_sqlite = ensdb_sqlite,)
+metadata <- read.delim("CD1A.RNAseq.metadata.txt", header = TRUE, as.is = TRUE)
 out <- "./full_analysis"
 
 if (!dir.exists(out)){
@@ -51,7 +52,8 @@ dev.off()
 
 
 ## read distribution across different genomic regions
-p3 <- check_read_distribution(featurecounts_list = counts_summary)
+p3 <- check_read_distribution(featurecounts_list = counts_summary,
+                             metadata = metadata)
 
 svglite(filename = file.path(out, "Fig2. Read distribution.svg"),
         height = 6, width = 7)
