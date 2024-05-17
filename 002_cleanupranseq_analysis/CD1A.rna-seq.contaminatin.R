@@ -256,7 +256,8 @@ plotPCA <- function(pca, metadata = data.frame(group = NULL, sample_name = NULL)
 }
 
 IR_rate <- check_read_distribution(featurecounts_list =
-                                          counts_summary)$IR_rate
+                                          counts_summary,
+                                  metadata = metadata)$IR_rate
 
 metadata$intergenic_rate <- merge(metadata, IR_rate,
                                   by.x = "sample_name", by.y = "row.names",
@@ -1382,7 +1383,8 @@ salmon$counts <- round(salmon$counts)
 salmon$counts <- salmon$counts[, metadata$sample_name]
 
 intergenic_stats <- check_read_distribution(featurecounts_list =
-                                          counts_summary)$IR_rate
+                                          counts_summary,
+                                           metadata = metadata)$IR_rate
 intergenic_stats <- assign_stats[!rownames(assign_stats) %in% excluded_samples, ,
                                  drop = FALSE]
 
