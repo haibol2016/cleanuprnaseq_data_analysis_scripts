@@ -61,7 +61,6 @@ p3$p & theme(axis.text.x = element_text(size = 6))
 dev.off()
 
 ## metadata reformatting
-metadata <- counts_summary$metadata
 metadata$sample_name <- factor(metadata$sample_name,
                                levels = metadata$sample_name)
 metadata$group <- gsub("CD1A\\(-\\)", "CD1A_N", metadata$group)
