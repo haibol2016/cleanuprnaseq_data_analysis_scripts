@@ -200,7 +200,6 @@ library("biomaRt")
 library("quantro")
 
 counts_summary <- readRDS(file.path(out, "Kevin_CD1A_14_full.counts.RDS"))
-metadata <- counts_summary$metadata
 metadata$sample_name <- factor(metadata$sample_name,
                                levels = metadata$sample_name)
 metadata$group <- gsub("CD1A\\(-\\)", "CD1A_N", metadata$group)
