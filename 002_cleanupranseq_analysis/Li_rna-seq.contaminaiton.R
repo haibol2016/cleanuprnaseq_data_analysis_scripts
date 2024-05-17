@@ -201,7 +201,8 @@ for (library_type in library_types)
   p1 & theme(axis.text.x = element_text(size = 5))
   dev.off()
   
-  p2 <- check_read_distribution(featurecounts_list = counts_summary)
+  p2 <- check_read_distribution(featurecounts_list = counts_summary,
+                               metadata = metadata)
   svglite(filename = file.path(out, "Fig1.Read distribution across genomic features.svg"),
           height = 6, width = 8)
   p2$p & theme(axis.text.x = element_text(size = 5))
@@ -378,7 +379,8 @@ for (library_type in library_types){
         })
       }
     
-      intergenic_rate <- check_read_distribution(featurecounts_list = counts_summary)$IR_rate
+      intergenic_rate <- check_read_distribution(featurecounts_list = counts_summary,
+                                                metadata = metadata)$IR_rate
       metadata <- merge(metadata, intergenic_rate, 
                         by.x = "sample_name",
                         b.y = "row.names",
