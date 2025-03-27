@@ -45,8 +45,6 @@ STAR  --runThreadN  8  \
       --limitSjdbInsertNsj  2000000 \
       --outSAMtype BAM Unsorted
 
-fi
-
 
 # remove intermediate files
 rm -rf   ${out}/${name[$i]}_STARtmp   ${out}/${name[$i]}_STARgenome ${out}/${name[$i]}Log.out \
